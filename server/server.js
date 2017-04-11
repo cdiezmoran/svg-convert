@@ -4,6 +4,10 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import path from 'path';
 import IntlWrapper from '../client/modules/Intl/IntlWrapper';
+import potrace from 'potrace';
+import multer from 'multer';
+import fs from 'fs';
+var upload = multer({ dest: 'uploads/' })
 
 // Webpack Requirements
 import webpack from 'webpack';
@@ -138,6 +142,17 @@ app.use((req, res, next) => {
       .catch((error) => next(error));
   });
 });
+
+// Image upload route
+app.post('/image', upload.single('upload'), function (req, res, next) {
+  console.log(req.file);
+  potrace.trace(req.file.path, function(err, svg) {
+    if (err) throw err;
+    fs.writeFileSync('./output.svg', svg);
+    res.set('Content-Type', 'application/download');
+    res.send(svg)
+  });
+})
 
 // start app
 app.listen(serverConfig.port, (error) => {

@@ -31,11 +31,28 @@ class PostListPage extends Component {
 
   render() {
     return (
-      <div>
-        <PostCreateWidget addPost={this.handleAddPost} showAddPost={this.props.showAddPost} />
-        <PostList handleDeletePost={this.handleDeletePost} posts={this.props.posts} />
-      </div>
+      <form ref="FormData" encType="multipart/form-data" onSubmit={this.onSubmit.bind(this)}>
+        <input type="file" ref="file" name="upload" />
+        <button type="submit">Submit</button>
+      </form>
     );
+  }
+
+  onSubmit(ev) {
+    ev.preventDefault();
+    const file = new FormData(this.refs.FormData);
+    const xhr = new XMLHttpRequest();
+    xhr.onload = (e) => {
+      console.log(e.target.responseText);
+      var file = new Blob(e.target.responseText)
+      var url = URL.createObjectURL(file)
+      const elm = document.createElement("a");
+      elm.href = url
+      elm.click();
+    };
+    xhr.open("POST", "/image");
+    xhr.send(file);
+    console.log(file);
   }
 }
 
